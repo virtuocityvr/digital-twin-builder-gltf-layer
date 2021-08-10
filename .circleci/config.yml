@@ -25,7 +25,7 @@ jobs:
       - run:
           name: Install requirements
           command: |
-            sudo pip install awscli==1.16.96
+            sudo -H pip install awscli --upgrade
             aws configure set default.region eu-west-1
             aws s3 cp s3://drc-aws-tools/drc-aws-tools-2.0.0.tar.gz /tmp/
             sudo pip install --upgrade /tmp/drc-aws-tools-2.0.0.tar.gz
