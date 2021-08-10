@@ -36,7 +36,8 @@ jobs:
       - run:
           name: Retrieve executable from docker image
           command: |
-            docker run digital-twin-builder-gltf-layer:$CIRCLE_SHA1
+            docker run potree-converter:$CIRCLE_SHA1
+            docker cp $(docker ps -aq):/dockerstuff/gltfpack-layer.zip ./
       - run:
           name: Upload layer content
           command: |
