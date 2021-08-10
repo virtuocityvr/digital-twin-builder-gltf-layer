@@ -17,18 +17,18 @@ jobs:
             make -f ./Makefile-deploy
       - persist_to_workspace:
           root: ~/digital-twin-builder-gltf-layer
-          path:
+          paths:
             - ./*
 
 workflows:
   version: 2
   build-and-deploy:
-  jobs:
-    - build:
-      context:
-        - master-account-deployment
-        - aws-default-region
-      filters:
-        branches:
-          only:
-                - /^(staging|main|epic\/)(.*)$/
+    jobs:
+      - build:
+        context:
+          - master-account-deployment
+          - aws-default-region
+        filters:
+          branches:
+            only:
+              - /^(staging|main|epic\/)(.*)$/
