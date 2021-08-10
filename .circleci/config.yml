@@ -50,16 +50,19 @@ jobs:
 workflows:
   version: 2
   build_and_push_docker:
-    context: 
-      - master-account-deployment
-      - aws-default-region
     jobs:
       - infrastructure:
+          context: 
+            - master-account-deployment
+            - aws-default-region
           filters:
             branches:
               only: 
                 - /^(master|epic\/)(.*)$/
       - build_and_push_layer:
+          context: 
+            - master-account-deployment
+            - aws-default-region
           filters:
             branches:
               only: 
