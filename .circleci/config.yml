@@ -6,7 +6,7 @@ orbs:
 jobs:
   infrastructure:
     docker:
-      - image: circleci/python:3.6.1
+      - image: circleci/python
     steps:
       - checkout
       - run:
@@ -29,10 +29,10 @@ jobs:
       - run:
           name: Install requirements
           command: |
-            pip install --user awscli
+            sudo pip install awscli
             ~/.local/bin/aws configure set default.region eu-west-1
             ~/.local/bin/aws s3 cp s3://drc-aws-tools/drc-aws-tools-2.0.0.tar.gz /tmp/
-            pip install --user --upgrade /tmp/drc-aws-tools-2.1.0.tar.gz        
+            sudo pip install --upgrade /tmp/drc-aws-tools-2.1.0.tar.gz        
       - run:
           name: Build docker image
           command: |
