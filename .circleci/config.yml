@@ -15,7 +15,7 @@ jobs:
       - run:
           name: Deploy infrastructure
           command: |
-            CloudformationDeploy PROD-digital-twin-builder-gltf-layer cfn.yaml empty-environment.json $CIRCLE_SHA1 PROD Vrex
+            CloudformationDeploy PROD-digital-twin-builder-gltf-layer cfn.yml empty-environment.json $CIRCLE_SHA1 PROD Vrex
   build_and_push_layer:
     docker:
       - image: circleci/python:3.6.1
