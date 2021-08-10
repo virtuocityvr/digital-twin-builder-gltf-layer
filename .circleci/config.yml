@@ -25,10 +25,10 @@ workflows:
   build-and-deploy:
     jobs:
       - build:
-        context:
-          - master-account-deployment
-          - aws-default-region
-        filters:
-          branches:
-            only:
-              - /^(staging|main|epic\/)(.*)$/
+          context:
+            - master-account-deployment
+            - aws-default-region
+          filters:
+            branches:
+              only:
+                - /^(staging|main|epic\/)(.*)$/
