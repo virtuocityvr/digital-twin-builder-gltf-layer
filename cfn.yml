@@ -1,0 +1,12 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: AWS CloudFormation template to create infrastructure required to create AWS Lambda layer with Gltfpack
+Resources:
+  DigitalTwinBuilderGltfLayerArtifactBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: digital-twin-builder-gltf-layer-artifacts
+      Tags:
+        - Key: pupil:Environment
+          Value: PROD
+        - Key: pupil:Application
+          Value: Gltfpack
