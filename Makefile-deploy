@@ -1,0 +1,33 @@
+CONTAINER_DIR=gltfpack-layer
+BIN_DIR=bin
+PACKER_NAME=gltfpack
+BUILD_DIR=build
+
+all: $(PACKER_NAME) delete_existing_folder create_folder move_file update_permission compress_folder clean
+
+$(PACKER_NAME):
+	${MAKE} $(PACKER_NAME)
+
+delete_existing_folder:
+ifeq ("$(wildcard $(CONTAINER_DIR))", "")
+	@echo "$(CONTAINER_DIR) directory does not exist"
+else
+	rm -rf $(CONTAINER_DIR)
+endif
+
+create_folder:
+	mkdir $(CONTAINER_DIR)
+	mkdir $(CONTAINER_DIR)/$(BIN_DIR)
+
+move_file:
+	mv $(PACKER_NAME) $(CONTAINER_DIR)/$(BIN_DIR)/$(PACKER_NAME);
+
+update_permission:
+	chmod -R 755 $(CONTAINER_DIR)
+
+compress_folder:
+	zip -r $(CONTAINER_DIR).zip $(CONTAINER_DIR)
+
+clean:
+	rm -rf $(CONTAINER_DIR)
+	rm -rf $(BUILD_DIR)

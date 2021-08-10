@@ -1,0 +1,34 @@
+version: 2.1
+orbs:
+  python: circleci/python@0.3.2
+  aws-cli: circleci/aws-cli@1.3.0
+  aws-ecr: circleci/aws-ecr@6.12.2
+
+jobs:
+  build:
+    working_directory: ~/digital-twin-builder-gltf-layer
+    docker:
+      - image: cimg/base:2020.01
+    steps:
+      - checkout
+      - run:
+          name: make to build
+          command: |
+            make -f ./Makefile-deploy
+      - persist_to_workspace:
+          root: ~/digital-twin-builder-gltf-layer
+          path:
+            - ./*
+
+workflows:
+  version: 2
+  build-and-deploy:
+  jobs:
+    - build:
+      context:
+        - master-account-deployment
+        - aws-default-region
+      filters:
+        branches:
+          only:
+                - /^(staging|main|epic\/)(.*)$/
