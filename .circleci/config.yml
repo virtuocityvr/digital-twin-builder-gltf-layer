@@ -50,6 +50,9 @@ jobs:
 workflows:
   version: 2
   build_and_push_docker:
+    context: 
+      - master-account-deployment
+      - aws-default-region
     jobs:
       - infrastructure:
           filters:
