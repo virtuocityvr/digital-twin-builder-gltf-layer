@@ -1,32 +1,65 @@
 version: 2.1
-
 jobs:
-  build:
-    working_directory: ~/digital-twin-builder-gltf-layer
+  infrastructure:
     docker:
-      - image: cimg/base:2020.01
+      - image: circleci/python:3.6.1
     steps:
       - checkout
-      - attach_workspace:
-          at: ~/digital-twin-builder-gltf-layer
       - run:
-          name: make to build
+          name: Install requirements
           command: |
-            make -f ./Makefile-deploy
-      - persist_to_workspace:
-          root: ~/digital-twin-builder-gltf-layer
-          paths:
-            - ./*
-
+            sudo pip install awscli==1.16.96
+            aws configure set default.region eu-west-1
+            aws s3 cp s3://drc-aws-tools/drc-aws-tools-2.0.0.tar.gz /tmp/
+            sudo pip install --upgrade /tmp/drc-aws-tools-2.0.0.tar.gz
+      - run:
+          name: Deploy infrastructure
+          command: |
+            CloudformationDeploy PROD-digital-twin-builder-gltf-layer cfn.yaml empty-environment.json $CIRCLE_SHA1 PROD Vrex
+  build_and_push_layer:
+    docker:
+      - image: circleci/python:3.6.1
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Install requirements
+          command: |
+            sudo pip install awscli==1.16.96
+            aws configure set default.region eu-west-1
+            aws s3 cp s3://drc-aws-tools/drc-aws-tools-2.0.0.tar.gz /tmp/
+            sudo pip install --upgrade /tmp/drc-aws-tools-2.0.0.tar.gz
+      - run:
+          name: Build docker image
+          command: |
+            docker build --rm -t digital-twin-builder-gltf-layer:$CIRCLE_SHA1 .
+      - run:
+          name: Retrieve executable from docker image
+          command: |
+            docker run digital-twin-builder-gltf-layer:$CIRCLE_SHA1
+            mkdir ./executable
+            docker cp $(docker ps -aq):/dockerstuff/gltfpack-layer.zip .
+      - run:
+          name: Upload layer content
+          command: |
+            aws s3api put-object --bucket digital-twin-builder-gltf-layer-artifacts --key $CIRCLE_SHA1.zip --body gltfpack-layer.zip
+      - run:
+          name: Create lambda layer
+          command: |
+            aws lambda publish-layer-version --layer-name Gltfpack --description "Statically built Gltfpack available at /bin/Gltfpack" --content S3Bucket=digital-twin-builder-gltf-layer-artifacts,S3Key=$CIRCLE_SHA1.zip --compatible-runtimes provided
 workflows:
   version: 2
-  build-and-deploy:
+  build_and_push_docker:
     jobs:
-      - build:
-          context:
-            - master-account-deployment
-            - aws-default-region
+      - infrastructure:
           filters:
             branches:
-              only:
-                - /^(staging|master|epic\/)(.*)$/
+              only: 
+                - /^(master|epic\/)(.*)$/
+      - build_and_push_layer:
+          filters:
+            branches:
+              only: 
+                - /^(master|epic\/)(.*)$/
+          requires:
+            - infrastructure

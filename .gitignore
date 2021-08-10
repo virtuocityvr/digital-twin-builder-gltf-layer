@@ -6,3 +6,4 @@ gltfpack
 /bin
 .DS_Store
 *.zip
+.circleci/config*.yml

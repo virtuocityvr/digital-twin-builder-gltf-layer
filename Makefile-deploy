@@ -3,31 +3,42 @@ BIN_DIR=bin
 PACKER_NAME=gltfpack
 BUILD_DIR=build
 
-all: $(PACKER_NAME) delete_existing_folder create_folder move_file update_permission compress_folder clean
+.PHONY: default
+default: finalise_zip clean
 
 $(PACKER_NAME):
 	${MAKE} $(PACKER_NAME)
 
-delete_existing_folder:
+delete_existing_folder: $(PACKER_NAME)
 ifeq ("$(wildcard $(CONTAINER_DIR))", "")
 	@echo "$(CONTAINER_DIR) directory does not exist"
 else
 	rm -rf $(CONTAINER_DIR)
 endif
 
-create_folder:
+ifeq ("$(wildcard $(CONTAINER_DIR).zip)", "")
+	@echo "$(CONTAINER_DIR) zip file does not exist"
+else 
+	@echo "Previous zip exist, delete it"
+	rm -rf $(CONTAINER_DIR).zip
+endif
+
+create_folder: delete_existing_folder
 	mkdir $(CONTAINER_DIR)
 	mkdir $(CONTAINER_DIR)/$(BIN_DIR)
 
-move_file:
+move_file: create_folder
 	mv $(PACKER_NAME) $(CONTAINER_DIR)/$(BIN_DIR)/$(PACKER_NAME);
 
-update_permission:
+update_permission: move_file
 	chmod -R 755 $(CONTAINER_DIR)
 
-compress_folder:
+.PHONY: finalise_zip
+finalise_zip: update_permission
 	zip -r $(CONTAINER_DIR).zip $(CONTAINER_DIR)
 
+
+.PHONY: clean
 clean:
 	rm -rf $(CONTAINER_DIR)
 	rm -rf $(BUILD_DIR)
