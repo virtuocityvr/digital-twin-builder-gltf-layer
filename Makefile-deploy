@@ -1,45 +1,43 @@
-CONTAINER_DIR=gltfpack-layer
+CONTAINER_NAME=gltfpack-layer
 BIN_DIR=bin
 PACKER_NAME=gltfpack
 BUILD_DIR=build
 
 .PHONY: default
-default: finalise_zip
+default: finalise_zip clean
 
 $(PACKER_NAME):
 	${MAKE} $(PACKER_NAME)
 
-# delete_existing_folder: $(PACKER_NAME)
-# ifeq ("$(wildcard $(CONTAINER_DIR))", "")
-# 	@echo "$(CONTAINER_DIR) directory does not exist"
-# else
-# 	rm -rf $(CONTAINER_DIR)
-# endif
+delete_existing_folder: $(PACKER_NAME)
+ifeq ("$(wildcard $(BIN_DIR))", "")
+	@echo "$(BIN_DIR) directory does not exist"
+else
+	rm -rf $(BIN_DIR)
+endif
 
-# ifeq ("$(wildcard $(CONTAINER_DIR).zip)", "")
-# 	@echo "$(CONTAINER_DIR) zip file does not exist"
-# else 
-# 	@echo "Previous zip exist, delete it"
-# 	rm -rf $(CONTAINER_DIR).zip
-# endif
+ifeq ("$(wildcard $(CONTAINER_NAME).zip)", "")
+	@echo "$(CONTAINER_NAME) zip file does not exist"
+else 
+	@echo "Previous zip exist, delete it"
+	rm -rf $(CONTAINER_NAME).zip
+endif
 
-# create_folder: delete_existing_folder
-# 	mkdir $(CONTAINER_DIR)
-# 	mkdir $(CONTAINER_DIR)/$(BIN_DIR)
+create_folder: delete_existing_folder
+	mkdir $(BIN_DIR)
 
-# move_file: create_folder
-# 	mv $(PACKER_NAME) $(CONTAINER_DIR)/$(BIN_DIR)/$(PACKER_NAME);
+move_file: create_folder
+	mv $(PACKER_NAME) $(BIN_DIR)/$(PACKER_NAME);
 
-update_permission: $(PACKER_NAME)
-# 	chmod -R 755 $(CONTAINER_DIR)
-	chmod -R 755 $(PACKER_NAME)
+update_permission: move_file
+	chmod -R 755 $(BIN_DIR)
 
 .PHONY: finalise_zip
 finalise_zip: update_permission
-	zip -r $(PACKER_NAME).zip $(PACKER_NAME)
+	zip -r $(CONTAINER_NAME).zip $(BIN_DIR)
 
 
 .PHONY: clean
 clean:
-	rm -rf $(CONTAINER_DIR)
+	rm -rf $(BIN_DIR)
 	rm -rf $(BUILD_DIR)
