@@ -30,7 +30,7 @@ $(PACKER_NAME):
 # move_file: create_folder
 # 	mv $(PACKER_NAME) $(CONTAINER_DIR)/$(BIN_DIR)/$(PACKER_NAME);
 
-update_permission: delete_existing_folder
+update_permission: $(PACKER_NAME)
 # 	chmod -R 755 $(CONTAINER_DIR)
 	chmod -R 755 $(PACKER_NAME)
 
